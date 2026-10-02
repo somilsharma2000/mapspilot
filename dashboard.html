@@ -135,6 +135,9 @@
   var ENTRY_ID   = "entry.1660400941";  // Lead ID
   var ENTRY_STAT = "entry.2081871134";  // New status
   var REFRESH_MS = 25 * 1000;
+  // Self-hosted mode: set to your Apps Script Web app URL (ends in /exec)
+  // When set, the dashboard reads + writes directly to YOUR Google Sheet — no other service.
+  var AS_URL = "";
 
   var leads = [];
   var key = localStorage.getItem("mp_admin_key") || "";
@@ -151,10 +154,26 @@
     load();
   }
 
+  function jsonp(url){
+    return new Promise(function(res, rej){
+      var n = "__mp" + Date.now() + Math.floor(Math.random()*999);
+      var s = document.createElement("script");
+      window[n] = function(d){ res(d); try{delete window[n];}catch(e){window[n]=null;} s.remove(); };
+      s.onerror = function(){ rej(new Error("jsonp failed")); s.remove(); };
+      s.src = url + (url.indexOf("?")>-1 ? "&" : "?") + "callback=" + n;
+      document.head.appendChild(s);
+    });
+  }
+
   async function load(){
     try{
-      var r = await fetch("leads.json?t=" + Date.now(), {cache:"no-store"});
-      var j = await r.json();
+      var j;
+      if(AS_URL){
+        j = await jsonp(AS_URL + "?action=get&t=" + Date.now());
+      } else {
+        var r = await fetch("leads.json?t=" + Date.now(), {cache:"no-store"});
+        j = await r.json();
+      }
       // apply local (unsynced) status changes that are newer than the file's
       var local = JSON.parse(localStorage.getItem("mp_local_status") || "{}");
       leads = (j.leads || []).map(function(l){
@@ -166,7 +185,7 @@
     }catch(e){ leads = []; }
     render();
     document.getElementById("syncNote").textContent =
-      "Live — synced from the website booking form automatically. Last checked " + new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}) + ".";
+      (AS_URL ? "Live — real-time from your Google Sheet. Last checked " : "Live — synced from the website booking form automatically. Last checked ") + new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}) + ".";
     scheduleRefresh();
   }
 
@@ -231,6 +250,12 @@
     var l = leads.filter(function(x){return x.id===id;})[0];
     if(l){ l.status = status; l.pending = true; }
     render();
+    if(AS_URL){
+      // self-hosted mode: write directly to the Google Sheet via Apps Script
+      fetch(AS_URL + "?action=set&id=" + encodeURIComponent(id) + "&status=" + encodeURIComponent(status), {mode:"no-cors"}).catch(function(){});
+      toast("Status saved");
+      return;
+    }
     // 2) real write-back through Google Forms
     var f = document.createElement("form");
     f.method = "POST"; f.action = STATUS_FORM_ACTION; f.target = "postframe";
@@ -258,7 +283,7 @@
     .forEach(function(p){
       if(l.kit[p[0]]) body += '<h4>'+p[1]+'</h4><pre>'+esc(l.kit[p[0]])+'<button class="copy" onclick="copyTxt(this)">COPY</button></pre>';
     });
-    if(!body) body = '<p style="color:var(--mut)">Kit still generating — check back in 30 minutes.</p>';
+    if(!body) body = '<p style="color:var(--mut)">Kit not ready yet — refresh in a moment.</p>';
     document.getElementById("mBody").innerHTML = body;
     document.getElementById("modal").classList.add("open");
   }
