@@ -4,6 +4,12 @@ Google Business Profile setup, management and review-reply automation for local 
 
 **One-person company. Built to be run from a laptop and a phone.**
 
+## Live
+
+- Website: https://somilsharma2000.github.io/mapspilot/
+- Admin dashboard: https://somilsharma2000.github.io/mapspilot/dashboard.html (key: MP-PILOT-2026-KEY)
+- Booking form: embedded Google Form, responses sync to the dashboard automatically every 30 minutes
+
 ## The business
 
 Local shops (salons, clinics, dentists, gyms, cafes, electricians) need to show up on Google Maps and "near me" searches. Most have no profile or a half-dead one. MapsPilot fixes that, then keeps it alive with automation.
@@ -25,10 +31,13 @@ Local shops (salons, clinics, dentists, gyms, cafes, electricians) need to show 
 
 ## Roadmap
 
+- [x] Website live on GitHub Pages
+- [x] Booking form (Google Forms)
+- [x] Admin dashboard with statuses
+- [x] Auto-sync workflow (every 30 min)
 - [x] GitHub repo created
 - [ ] Base44 app created (landing page + booking form + admin dashboard)
 - [ ] Lead dashboard live
-- [ ] WhatsApp follow-up automation
 - [ ] Review Autopilot (AI review replies)
 - [ ] First 10 paying shops
 - [ ] Monthly report generator
