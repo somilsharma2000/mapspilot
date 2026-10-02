@@ -113,29 +113,8 @@
   <div class="wrap">
     <h2>Book your free profile check</h2>
     <p class="lead">Fill this in — we'll reply on WhatsApp within a few hours with your free 5-point report.</p>
-    <form id="bookForm">
-      <label for="bname">Business name</label>
-      <input id="bname" required placeholder="e.g. Sharma Salon & Spa">
-      <label for="btype">Business type</label>
-      <select id="btype">
-        <option>Salon / Barber</option><option>Clinic / Dentist</option><option>Gym / Trainer</option>
-        <option>Restaurant / Cafe</option><option>Electrician / Plumber / AC Repair</option>
-        <option>Coaching / Tuition</option><option>Retail Shop</option><option>Other</option>
-      </select>
-      <label for="city">City / Area</label>
-      <input id="city" required placeholder="e.g. Jaipur, Vaishali Nagar">
-      <label for="phone">Your WhatsApp number</label>
-      <input id="phone" required placeholder="10-digit mobile number" inputmode="numeric">
-      <label for="need">What do you need?</label>
-      <select id="need">
-        <option>New profile setup (₹2,999)</option>
-        <option>Fix my existing profile (₹1,999)</option>
-        <option>Setup + Monthly Care</option>
-        <option>Not sure — just the free check</option>
-      </select>
-      <button class="submit" type="submit">Send on WhatsApp →</button>
-      <p class="fine">Opens WhatsApp with your details pre-filled. Your details are used only to reply about this enquiry.</p>
-    </form>
+    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdCeVP3_xSDB-oxEJjA-8XQXjtrs_POMwa2PgvnEiFOhXQCig/viewform?embedded=true" width="100%" height="620" frameborder="0" marginheight="0" marginwidth="0" style="border:1px solid var(--line);border-radius:14px;background:#fff">Loading booking form…</iframe>
+    <p class="fine">Your details go straight to the MapsPilot team dashboard — we reply on WhatsApp within a few hours.</p>
   </div>
 </section>
 
@@ -156,40 +135,6 @@
   <p style="margin-top:6px">MapsPilot is an independent service and is not affiliated with Google.</p>
 </footer>
 
-<script>
-  // ==== CONFIG: lead submission endpoint (set when live database is connected) ====
-  var API_SUBMIT = ""; // e.g. "https://<app>.base44.app/functions/mapspilot_submit_lead"
-  var WHATSAPP_FALLBACK = "91XXXXXXXXXX"; // temporary transport until the endpoint above is set
 
-  document.getElementById("bookForm").addEventListener("submit", function(e){
-    e.preventDefault();
-    var data = {
-      businessName: document.getElementById("bname").value,
-      businessType: document.getElementById("btype").value,
-      city: document.getElementById("city").value,
-      phone: document.getElementById("phone").value,
-      need: document.getElementById("need").value
-    };
-    if (API_SUBMIT) {
-      fetch(API_SUBMIT, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(data)
-      }).then(function(r){ return r.json(); })
-        .then(function(j){
-          if (j.ok) { document.getElementById("bookForm").innerHTML = "<h3 style='color:#059669'>Request received!</h3><p>We'll reach out on WhatsApp within a few hours with your free profile check.</p>"; }
-        });
-      return;
-    }
-    // fallback: WhatsApp transport
-    var msg = "Hi MapsPilot! I'd like the free Google profile check.%0A%0A"
-      + "Business: " + encodeURIComponent(data.businessName) + "%0A"
-      + "Type: " + encodeURIComponent(data.businessType) + "%0A"
-      + "City/Area: " + encodeURIComponent(data.city) + "%0A"
-      + "WhatsApp: " + encodeURIComponent(data.phone) + "%0A"
-      + "Need: " + encodeURIComponent(data.need);
-    window.open("https://wa.me/" + WHATSAPP_FALLBACK + "?text=" + msg, "_blank");
-  });
-</script>
 </body>
 </html>
