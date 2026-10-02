@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MapsPilot — Admin Dashboard</title>
+<meta name="robots" content="noindex">
+<style>
+  :root{--ink:#111827;--mut:#6b7280;--brand:#0f5ef2;--bg:#f1f4f9;--card:#fff;--line:#e5e7eb;--ok:#059669;--warn:#b45309;--bad:#dc2626;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);}
+  .wrap{max-width:1100px;margin:0 auto;padding:20px;}
+  .top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px;}
+  .logo{font-weight:800;font-size:1.15rem;}
+  .logo span{color:var(--brand);}
+  .keybox{display:flex;gap:8px;align-items:center;}
+  .keybox input{padding:9px 12px;border:1px solid var(--line);border-radius:8px;font-size:.9rem;width:200px;}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-bottom:18px;}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center;}
+  .stat .n{font-size:1.6rem;font-weight:800;}
+  .stat .l{font-size:.75rem;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;}
+  .stat.new .n{color:var(--brand);} .stat.won .n{color:var(--ok);} .stat.lost .n{color:var(--bad);}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;}
+  .panel h3{font-size:1rem;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
+  #search{padding:8px 12px;border:1px solid var(--line);border-radius:8px;font-size:.9rem;width:220px;max-width:100%;}
+  table{width:100%;border-collapse:collapse;font-size:.88rem;}
+  th{text-align:left;color:var(--mut);font-size:.75rem;text-transform:uppercase;letter-spacing:.4px;padding:8px;border-bottom:2px solid var(--line);}
+  td{padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  .pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:.72rem;font-weight:700;}
+  .p-new{background:#e8f0ff;color:var(--brand);} .p-contacted{background:#fef3c7;color:var(--warn);}
+  .p-won{background:#d1fae5;color:var(--ok);} .p-lost{background:#fee2e2;color:var(--bad);}
+  select.st{padding:5px 8px;border:1px solid var(--line);border-radius:7px;font-size:.8rem;background:#fff;}
+  .tel{color:var(--brand);text-decoration:none;font-weight:600;}
+  .note{font-size:.78rem;color:var(--mut);margin-top:10px;}
+  .demo{background:#fff7ed;border:1px dashed #fdba74;}
+  .demo td{color:#92600a;}
+  #lock{max-width:420px;margin:12vh auto;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:30px;text-align:center;}
+  #lock input{width:100%;padding:12px;border:1px solid var(--line);border-radius:8px;font-size:1rem;text-align:center;letter-spacing:2px;}
+  #lock button{width:100%;margin-top:12px;padding:12px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-weight:700;font-size:.95rem;cursor:pointer;}
+  .err{color:var(--bad);font-size:.85rem;margin-top:10px;display:none;}
+  .offline{background:#fff7ed;color:#92600a;font-size:.75rem;border-radius:6px;padding:3px 8px;display:inline-block;margin-top:4px;}
+  @media(max-width:640px){th:nth-child(4),td:nth-child(4){display:none;}#search{width:100%;}}
+</style>
+</head>
+<body>
+
+<div id="lock">
+  <div class="logo" style="margin-bottom:6px">Maps<span style="color:var(--brand)">Pilot</span></div>
+  <p style="color:var(--mut);font-size:.85rem;margin-bottom:16px">Admin Dashboard — enter your admin key</p>
+  <input id="keyInput" placeholder="ADMIN KEY" autocomplete="off">
+  <button onclick="unlock()">Open Dashboard</button>
+  <p class="err" id="keyErr">Wrong key. Try again.</p>
+</div>
+
+<div id="app" class="wrap" style="display:none">
+  <div class="top">
+    <div class="logo">Maps<span>Pilot</span> <small style="color:var(--mut);font-weight:400">Admin</small></div>
+    <div class="keybox">
+      <button onclick="refresh()" style="padding:9px 14px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:.85rem;cursor:pointer">↻ Refresh</button>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n" id="s-total">0</div><div class="l">Total leads</div></div>
+    <div class="stat new"><div class="n" id="s-new">0</div><div class="l">New</div></div>
+    <div class="stat"><div class="n" id="s-contacted">0</div><div class="l">Contacted</div></div>
+    <div class="stat won"><div class="n" id="s-won">0</div><div class="l">Won</div></div>
+    <div class="stat lost"><div class="n" id="s-lost">0</div><div class="l">Lost</div></div>
+  </div>
+
+  <div class="panel">
+    <h3>Leads <input id="search" placeholder="Search name / city / phone…" oninput="render()"></h3>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Business</th><th>City</th><th>Phone</th><th>Needs</th><th>Received</th><th>Status</th></tr></thead>
+        <tbody id="rows"><tr><td colspan="6" style="text-align:center;color:var(--mut)">Loading…</td></tr></tbody>
+      </table>
+    </div>
+    <p class="note" id="syncNote"></p>
+  </div>
+</div>
+
+<script>
+  // ==== CONFIG (filled when the database endpoint is connected) ====
+  var ADMIN_KEY_DEFAULT = "MP-PILOT-2026-KEY";
+  var API_GET  = "";   // e.g. "https://<your-app>.base44.app/functions/get_leads"
+  var API_UPD  = "";   // e.g. "https://<your-app>.base44.app/functions/update_lead"
+  var LOCAL_LEADS_FILE = "leads.json"; // repo-synced leads (offline fallback)
+
+  var leads = [];
+  var key = localStorage.getItem("mp_admin_key") || "";
+  var apiLive = false;
+
+  function unlock(){
+    var v = document.getElementById("keyInput").value.trim();
+    if(v !== ADMIN_KEY_DEFAULT){ document.getElementById("keyErr").style.display="block"; return; }
+    localStorage.setItem("mp_admin_key", v); key = v;
+    showApp();
+  }
+
+  function showApp(){
+    document.getElementById("lock").style.display="none";
+    document.getElementById("app").style.display="block";
+    load();
+  }
+
+  async function load(){
+    var rows = [];
+    // 1) live API if connected
+    if(API_GET){
+      try{
+        var r = await fetch(API_GET, {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({key:key})});
+        var j = await r.json();
+        if(j.ok){ rows = j.leads.map(fromApi); apiLive = true; }
+      }catch(e){}
+    }
+    // 2) repo-synced leads.json fallback
+    if(!apiLive){
+      try{
+        var r2 = await fetch(LOCAL_LEADS_FILE + "?t=" + Date.now());
+        var j2 = await r2.json();
+        rows = (j2.leads || []).map(fromFile);
+      }catch(e){ rows = []; }
+    }
+    // merge device-local status changes
+    var local = JSON.parse(localStorage.getItem("mp_status_overrides") || "{}");
+    rows.forEach(function(l){ if(local[l.id]) l.status = local[l.id]; });
+    leads = rows;
+    render();
+    var note = document.getElementById("syncNote");
+    note.textContent = apiLive
+      ? "Live database connected."
+      : "Offline mode: leads shown from the repo sync; status changes save on this device until the live database is connected.";
+  }
+
+  function fromApi(l){
+    var d = l.data || l;
+    return {id:l.id, name:d.businessName, type:d.businessType, city:d.city, phone:d.phone, need:d.need, status:d.status||"new", created:l.created_date||"", demo:false};
+  }
+  function fromFile(l){
+    return {id:l.id, name:l.businessName, type:l.businessType, city:l.city, phone:l.phone, need:l.need, status:l.status||"new", created:l.created||"", demo:!!l.demo};
+  }
+
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];}); }
+
+  function render(){
+    var q = (document.getElementById("search").value||"").toLowerCase();
+    var list = leads.filter(function(l){
+      return !q || (l.name+" "+l.city+" "+l.phone).toLowerCase().indexOf(q) !== -1;
+    });
+    var c = {total:leads.length, new:0, contacted:0, won:0, lost:0};
+    leads.forEach(function(l){ c[l.status] = (c[l.status]||0)+1; });
+    document.getElementById("s-total").textContent = c.total;
+    document.getElementById("s-new").textContent = c["new"]||0;
+    document.getElementById("s-contacted").textContent = c.contacted||0;
+    document.getElementById("s-won").textContent = c.won||0;
+    document.getElementById("s-lost").textContent = c.lost||0;
+
+    var html = "";
+    if(!list.length){ html = '<tr><td colspan="6" style="text-align:center;color:var(--mut)">No leads yet. New bookings from the site will appear here.</td></tr>'; }
+    list.forEach(function(l){
+      var opts = ["new","contacted","won","lost"].map(function(s){
+        return '<option value="'+s+'"'+(l.status===s?" selected":"")+">"+s+"</option>";
+      }).join("");
+      html += '<tr'+(l.demo?' class="demo"':'')+'>'
+        + '<td><b>'+esc(l.name)+'</b>'+(l.demo?' <span style="font-size:.7rem">(sample)</span>':'')+'<br><small style="color:var(--mut)">'+esc(l.type||"")+'</small></td>'
+        + '<td>'+esc(l.city)+'</td>'
+        + '<td><a class="tel" href="tel:'+esc(l.phone)+'">'+esc(l.phone)+'</a></td>'
+        + '<td style="max-width:200px">'+esc(l.need||"")+'</td>'
+        + '<td style="white-space:nowrap">'+esc((l.created||"").replace("T"," ").slice(0,16))+'</td>'
+        + '<td><span class="pill p-'+l.status+'">'+l.status+'</span><br>'
+        + '<select class="st" onchange="setStatus(\''+l.id+'\', this.value)">'+opts+'</select></td>'
+        + '</tr>';
+    });
+    document.getElementById("rows").innerHTML = html;
+  }
+
+  function setStatus(id, status){
+    // always save locally
+    var local = JSON.parse(localStorage.getItem("mp_status_overrides") || "{}");
+    local[id] = status;
+    localStorage.setItem("mp_status_overrides", JSON.stringify(local));
+    var l = leads.filter(function(x){return x.id===id;})[0];
+    if(l) l.status = status;
+    render();
+    // push to live API if connected
+    if(apiLive && API_UPD){
+      fetch(API_UPD, {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({key:key, id:id, status:status})}).catch(function(){});
+    }
+  }
+
+  function refresh(){ load(); }
+
+  if(key) showApp();
+</script>
+</body>
+</html>

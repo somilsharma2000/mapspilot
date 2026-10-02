@@ -157,17 +157,38 @@
 </footer>
 
 <script>
-  // CONFIG: set your WhatsApp number here (country code + number, digits only)
-  var WHATSAPP_NUMBER = "91XXXXXXXXXX";
+  // ==== CONFIG: lead submission endpoint (set when live database is connected) ====
+  var API_SUBMIT = ""; // e.g. "https://<app>.base44.app/functions/mapspilot_submit_lead"
+  var WHATSAPP_FALLBACK = "91XXXXXXXXXX"; // temporary transport until the endpoint above is set
+
   document.getElementById("bookForm").addEventListener("submit", function(e){
     e.preventDefault();
+    var data = {
+      businessName: document.getElementById("bname").value,
+      businessType: document.getElementById("btype").value,
+      city: document.getElementById("city").value,
+      phone: document.getElementById("phone").value,
+      need: document.getElementById("need").value
+    };
+    if (API_SUBMIT) {
+      fetch(API_SUBMIT, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(data)
+      }).then(function(r){ return r.json(); })
+        .then(function(j){
+          if (j.ok) { document.getElementById("bookForm").innerHTML = "<h3 style='color:#059669'>Request received!</h3><p>We'll reach out on WhatsApp within a few hours with your free profile check.</p>"; }
+        });
+      return;
+    }
+    // fallback: WhatsApp transport
     var msg = "Hi MapsPilot! I'd like the free Google profile check.%0A%0A"
-      + "Business: " + encodeURIComponent(document.getElementById("bname").value) + "%0A"
-      + "Type: " + encodeURIComponent(document.getElementById("btype").value) + "%0A"
-      + "City/Area: " + encodeURIComponent(document.getElementById("city").value) + "%0A"
-      + "WhatsApp: " + encodeURIComponent(document.getElementById("phone").value) + "%0A"
-      + "Need: " + encodeURIComponent(document.getElementById("need").value);
-    window.open("https://wa.me/" + WHATSAPP_NUMBER + "?text=" + msg, "_blank");
+      + "Business: " + encodeURIComponent(data.businessName) + "%0A"
+      + "Type: " + encodeURIComponent(data.businessType) + "%0A"
+      + "City/Area: " + encodeURIComponent(data.city) + "%0A"
+      + "WhatsApp: " + encodeURIComponent(data.phone) + "%0A"
+      + "Need: " + encodeURIComponent(data.need);
+    window.open("https://wa.me/" + WHATSAPP_FALLBACK + "?text=" + msg, "_blank");
   });
 </script>
 </body>
