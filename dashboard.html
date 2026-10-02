@@ -134,7 +134,7 @@
   var STATUS_FORM_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLSdwnnUx0dyqZfsDkbhxIaaMvuMnGKplscldGy0crfONF_AiNA/formResponse";
   var ENTRY_ID   = "entry.1660400941";  // Lead ID
   var ENTRY_STAT = "entry.2081871134";  // New status
-  var REFRESH_MS = 5 * 60 * 1000;
+  var REFRESH_MS = 25 * 1000;
 
   var leads = [];
   var key = localStorage.getItem("mp_admin_key") || "";
@@ -202,7 +202,7 @@
 
     var html = "";
     if(!list.length){
-      html = '<tr><td colspan="6" class="empty">No leads yet.<br>Every booking from the website lands here automatically — usually within 30 minutes.</td></tr>';
+      html = '<tr><td colspan="6" class="empty">No leads yet.<br>Every booking from the website lands here automatically, in real time.</td></tr>';
     }
     list.forEach(function(l){
       var opts = ["new","contacted","won","lost"].map(function(s){
