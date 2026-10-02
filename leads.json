@@ -1,3 +1,24 @@
 {
-  "leads": []
+  "leads": [
+    {
+      "id": "ACYDBNhmQV_4noccOWGHpKnPh9KGow0_v2UcZMm-wCNLLd_kJ5bTU6N1cWM9-GKimI6Q_M0",
+      "businessName": "TEST SHOP — sample lead, ignore",
+      "businessType": "Clinic / Dentist",
+      "city": "Jaipur, Vaishali Nagar",
+      "phone": "9999999999",
+      "need": "Fix my existing profile (₹1,999)",
+      "status": "new",
+      "created": "2026-10-02 10:26",
+      "createdTs": 1790914568511,
+      "kit": {
+        "pitch": "Hi! This is MapsPilot. You asked for the free Google profile check for TEST SHOP. I've finished the first look at your clinic's profile — can I send you the 5-point report on WhatsApp today?",
+        "description": "Trusted clinic in Vaishali Nagar, Jaipur. We offer caring, personal treatment for your whole family. Our doctors take time to listen, explain clearly, and treat with modern equipment. Walk in for general consultations, or call to book your visit. Easy parking nearby. Open six days a week for your convenience.",
+        "categories": "1) Medical Clinic  2) Doctor  3) Medical Center — pick the first one as primary.",
+        "welcome": "Welcome to TEST SHOP on Google! Find us in Vaishali Nagar, Jaipur. Call to book your visit — we're here six days a week.",
+        "offer": "Free consultation for first-time patients this month. Show this post at the counter. Call to book.",
+        "review": "1) Positive: \"Thank you so much for your kind words! We're glad you had a good experience. See you at your next visit.\"\n2) Mixed: \"Thank you for the feedback. We're sorry about the wait — we're adjusting appointment slots. Please call ahead and we'll fit you in faster.\"\n3) Negative: \"We're sorry your visit didn't go well. Please call us directly so we can understand and make it right.\"",
+        "audit": "1) Photos: add 8-10 clear clinic photos (front board, waiting area, doctor, equipment).\n2) Hours: confirm opening days/times, add holiday hours.\n3) Category: currently check primary category is set correctly.\n4) Services: list consultations, checkups, follow-ups as services.\n5) Reviews: ask every happy patient for a Google review using the review link."
+      }
+    }
+  ]
 }
