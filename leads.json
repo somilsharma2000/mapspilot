@@ -1,15 +1,3 @@
 {
-  "leads": [
-    {
-      "id": "sample-1",
-      "businessName": "Sharma Salon & Spa",
-      "businessType": "Salon / Barber",
-      "city": "Jaipur, Vaishali Nagar",
-      "phone": "9999999999",
-      "need": "New profile setup (₹2,999)",
-      "status": "new",
-      "created": "2026-10-02 09:30",
-      "demo": true
-    }
-  ]
+  "leads": []
 }
