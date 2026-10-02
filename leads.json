@@ -7,7 +7,7 @@
       "city": "Jaipur, Vaishali Nagar",
       "phone": "9999999999",
       "need": "Fix my existing profile (₹1,999)",
-      "status": "new",
+      "status": "lost",
       "created": "2026-10-02 10:26",
       "createdTs": 1790914568511,
       "kit": {
@@ -18,7 +18,8 @@
         "offer": "Free consultation for first-time patients this month. Show this post at the counter. Call to book.",
         "review": "1) Positive: \"Thank you so much for your kind words! We're glad you had a good experience. See you at your next visit.\"\n2) Mixed: \"Thank you for the feedback. We're sorry about the wait — we're adjusting appointment slots. Please call ahead and we'll fit you in faster.\"\n3) Negative: \"We're sorry your visit didn't go well. Please call us directly so we can understand and make it right.\"",
         "audit": "1) Photos: add 8-10 clear clinic photos (front board, waiting area, doctor, equipment).\n2) Hours: confirm opening days/times, add holiday hours.\n3) Category: currently check primary category is set correctly.\n4) Services: list consultations, checkups, follow-ups as services.\n5) Reviews: ask every happy patient for a Google review using the review link."
-      }
+      },
+      "statusTs": 1790916000000
     }
   ]
 }
