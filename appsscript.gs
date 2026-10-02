@@ -66,6 +66,8 @@ function onFormSubmit(e) {
   try {
     var v = e.namedValues || {};
     var name = v["Business name"] || "New business";
+
+    // 1) instant notification to YOU
     var subject = "New MapsPilot lead: " + name;
     var body =
       "New booking just came in!\n\n" +
@@ -75,8 +77,25 @@ function onFormSubmit(e) {
       "WhatsApp: " + (v["Your WhatsApp number"] || "-") + "\n" +
       "They need: " + (v["What do you need?"] || "-") + "\n\n" +
       "Open your Control Center: " + DASHBOARD_URL + "\n" +
-      "Call them from the dashboard - the service kit is ready for copy-paste.";
+      "Call them from the dashboard - the service kit is ready to copy-paste.";
     MailApp.sendEmail(OWNER_EMAIL, subject, body);
+
+    // 2) instant confirmation to the CUSTOMER (if they gave an email)
+    var email = "";
+    for (var k in v) {
+      if (k.toLowerCase().indexOf("email") > -1) email = String(v[k] || "").trim();
+    }
+    if (email && email.indexOf("@") > 2 && email.indexOf(".") > 0) {
+      MailApp.sendEmail(email,
+        "Got it - your free MapsPilot profile check",
+        "Hi!\n\n" +
+        "Thanks for booking the free Google profile check for " + name + ".\n\n" +
+        "Here is what happens next:\n" +
+        "1) Our team checks your Google presence (photos, hours, description, categories, reviews)\n" +
+        "2) You get a simple 5-point report on WhatsApp within a few hours\n" +
+        "3) No obligation - if you like what you see, we can fix everything within 48 hours\n\n" +
+        "Talk very soon,\nTeam MapsPilot");
+    }
   } catch (err) {
     // never let a notification error block anything
   }
@@ -88,28 +107,44 @@ function onFormSubmit(e) {
 
 function getLeads() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var formSheet = ss.getSheets()[0]; // "Form Responses 1"
+  var formSheet = ss.getSheets()[0]; // "Form responses 1"
   var data = formSheet.getDataRange().getValues();
+  if (data.length < 2) return [];
   var statuses = getStatusMap(ss);
+
+  // map columns by header name so reordering questions never breaks this
+  var head = data[0].map(function(h) { return String(h).toLowerCase(); });
+  function col(key) {
+    for (var i = 0; i < head.length; i++) {
+      if (head[i].indexOf(key) > -1) return i;
+    }
+    return -1;
+  }
+  var cName = col("business name"), cType = col("business type"),
+      cCity = col("city"), cPhone = col("whatsapp"),
+      cNeed = col("what do you need"), cEmail = col("email");
 
   var leads = [];
   for (var i = 1; i < data.length; i++) { // row 0 = headers
     var row = data[i];
-    if (!row[1]) continue; // skip empty rows
+    if (cName < 0 || !row[cName]) continue; // skip empty rows
     var id = "R" + (i + 1); // stable id (form responses only append)
-    var ts = row[0] instanceof Date ? row[0] : new Date();
-    var type = String(row[2] || "Other");
+    var ts = (row[0] instanceof Date) ? row[0] : new Date();
+    var type = String((cType > -1 ? row[cType] : "") || "Other");
+    var name = String(row[cName]);
+    var city = String((cCity > -1 ? row[cCity] : "") || "");
     var lead = {
       id: id,
-      businessName: String(row[1]),
+      businessName: name,
       businessType: type,
-      city: String(row[3] || ""),
-      phone: String(row[4] || ""),
-      need: String(row[5] || ""),
+      city: city,
+      phone: String((cPhone > -1 ? row[cPhone] : "") || ""),
+      need: String((cNeed > -1 ? row[cNeed] : "") || ""),
+      email: String((cEmail > -1 ? row[cEmail] : "") || ""),
       status: statuses[id] || "new",
       created: Utilities.formatDate(ts, "Asia/Calcutta", "yyyy-MM-dd HH:mm"),
       createdTs: ts.getTime(),
-      kit: makeKit(String(row[1]), type, String(row[3] || "your area"))
+      kit: makeKit(name, type, city || "your area")
     };
     leads.push(lead);
   }
